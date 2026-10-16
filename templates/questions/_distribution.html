@@ -1,0 +1,58 @@
+<section class='panel'>
+  <h2>{{ distribution_title }}</h2>
+  {% if not is_imported %}<p class='muted'>Demonstration distributions, including work-area breakdowns, are generated examples.</p>{% endif %}
+  {% if group_filter_invalid %}<div class='notice'>No eligible responses match the selected groups. Choose another group or use All groups combined.</div>{% endif %}
+  <p>Categories reflect this question's {{ question.get_response_type_display|default:question.response_type }} response type. Each bar totals 100%; counts reconcile to the selected group and missing values are shown separately.</p>
+  {% if comparison %}
+  <div class='notice'>
+    <strong>Difference between selected groups:</strong>
+    {{ comparison.highest.label }} has the highest {{ question.metric_label }} result at {{ comparison.highest.metric }}%;
+    {{ comparison.lowest.label }} has the lowest at {{ comparison.lowest.metric }}%.
+    The gap is <strong>{{ comparison.gap }} percentage points</strong>.
+    This is a descriptive difference and does not establish its cause.
+  </div>
+  {% endif %}
+  <div class='likert-chart{% if is_imported %} cohort-chart{% endif %}' aria-hidden='true'>
+    {% for row in rows %}
+    <div class='likert-row'>
+      <b>{{ row.survey.label }}<small>{{ row.label }}</small></b>
+      <div>{% for item in row.items %}<i class='cat-{{ forloop.counter }}' style='width:{{ item.percentage }}%' title='{{ item.category }}: {{ item.percentage }}%'></i>{% endfor %}</div>
+      <span>{{ row.metric }}% {{ question.metric_label }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  <div class='legend'>{% for item in rows.0.items %}<span class='cat-{{ forloop.counter }}'>{{ item.category }}</span>{% endfor %}</div>
+  <div class='table-wrap'>
+    <table>
+      <caption>Complete response distribution by survey period and selected work area</caption>
+      <thead><tr><th>Survey</th><th>Work area</th>{% for item in rows.0.items %}<th>{{ item.category }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for row in rows %}
+        <tr><th>{{ row.survey.label }}</th><th>{{ row.label|default:'All work areas' }} (n={{ row.responses }})</th>{% for item in row.items %}<td>{{ item.count }} ({{ item.percentage }}%)</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<section class='panel'>
+  <h2>Changes in selected responses</h2>
+  <p>A percentage-point change is the arithmetic difference between two percentages; for example, 72% to 78% is an increase of 6 percentage points. Each option is compared with the preceding available period in the same group. These are group distributions, not matched individual changes.</p>
+  {% if changes %}<div class='table-wrap'><table>
+    <caption>Change in each response option by period and group</caption>
+    <thead><tr><th>Period comparison</th><th>Work area</th>{% for item in rows.0.items %}<th>{{ item.category }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for row in changes %}<tr><th>{{ row.previous_survey.label }} → {{ row.survey.label }}</th><th>{{ row.group }}</th>{% for item in row.items %}<td>{{ item.previous_percentage }}% → {{ item.percentage }}%<br>{% if item.change > 0 %}+{% endif %}{{ item.change }} percentage points</td>{% endfor %}</tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p>Select at least two available periods to compare the response options.</p>{% endif %}
+</section>
+<div{% if show_themes %} class='grid-2'{% endif %}>
+  {% if show_themes %}
+  <section class='panel'>
+    <h2>Associated themes</h2>
+    {% for theme in themes %}<a class='movement-row' href='{% url 'pulse:theme' theme.slug %}'><span>{{ theme.name }}</span><strong>{{ theme.prevalence }}%</strong></a>{% empty %}<p>No reviewed themes are linked to this question.</p>{% endfor %}
+  </section>
+  {% endif %}
+  <section class='panel'>
+    <h2>Individual responses</h2>
+    <p class='muted'>Open an employee to review their exact written answers and prior-period wording. Filters do not place names or comments in the URL.</p>
+    {% for employee in employees %}<a class='movement-row' href='{% url 'pulse:employee' employee.id %}{% if is_imported %}?survey={{ question.survey_import.pk }}{% else %}?survey={{ surveys.last.slug }}{% endif %}'><span>{{ employee.name }}</span><strong>View &rarr;</strong></a>{% empty %}<p>No individual responses are available.</p>{% endfor %}
+  </section>
+</div>

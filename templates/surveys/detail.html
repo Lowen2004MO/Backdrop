@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ survey.label }} | People Pulse Analytics{% endblock %}
+{% block content %}
+<nav class='breadcrumbs' aria-label='Breadcrumb'><a href='{% url 'pulse:surveys' %}'>Surveys</a> / <span aria-current='page'>{{ survey.label }}</span></nav>
+<div class='page-head'>
+  <div><h1>{{ survey.label }}</h1></div>
+  {% if is_imported %}<a class='button primary' href='{% url 'pulse:survey_text_analysis' survey.pk %}'>View text analysis</a>{% endif %}
+</div>
+<div class='metric-grid'>
+  <article class='metric'><span>Responses</span><strong>{{ survey.responses }}</strong></article>
+  <article class='metric'><span>Analysis</span><strong>{{ survey.analysis_status }}</strong></article>
+  <article class='metric'><span>Version</span><strong>{{ survey.version }}</strong></article>
+</div>
+{% if is_imported %}
+<div class='notice'>Choice and yes/no columns can be configured as respondent dimensions. Dimensions become group filters on every other uploaded question.</div>
+{% endif %}
+<section class='panel'>
+  <h2>Question mapping summary</h2>
+  <div class='table-wrap'><table>
+    <caption>Questions available for analysis</caption>
+    <thead><tr><th>Question</th><th>Response type</th><th>Comparability</th><th>Mapping state</th>{% if is_imported %}<th>Respondent filter</th>{% endif %}</tr></thead>
+    <tbody>
+      {% for q in questions %}
+      <tr>
+        <td><a href='{% url 'pulse:question' q.slug %}{% if not is_imported %}?period={{ survey.slug }}{% endif %}'>{{ q.text }}</a></td>
+        <td>{{ q.get_response_type_display|default:q.response_type }}</td>
+        <td>{% if q.comparable %}Comparable over time{% else %}Period-specific{% endif %}</td>
+        <td><span class='status'>{% if is_imported %}{{ q.mapping_state }}{% else %}Confirmed{% endif %}</span></td>
+        {% if is_imported %}<td>
+          {% if q.response_type == 'choice' or q.response_type == 'binary' %}
+            <span class='status'>{% if q.is_dimension %}Enabled{% else %}Not enabled{% endif %}</span>
+            {% if can_upload %}<form class='inline-form' method='post' action='{% url 'pulse:toggle_dimension' survey.pk q.pk %}'>{% csrf_token %}<button class='button' type='submit'>{% if q.is_dimension %}Remove filter{% else %}Use as filter{% endif %}</button></form>{% endif %}
+          {% else %}Not applicable{% endif %}
+        </td>{% endif %}
+      </tr>
+      {% empty %}<tr><td colspan='5'>No question columns were detected.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}

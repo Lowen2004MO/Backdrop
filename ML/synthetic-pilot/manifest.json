@@ -1,0 +1,47 @@
+{
+  "dataset_version": "synthetic-pilot-v1",
+  "prepared": "2026-10-16",
+  "source": "Entirely AI-authored fictional examples and draft labels; no employee data or application-rule labelling.",
+  "purpose": "Annotation pilot and pipeline development; not real-world accuracy evidence.",
+  "theme_order": [
+    "workload",
+    "manager",
+    "career",
+    "communication",
+    "tools",
+    "team",
+    "change"
+  ],
+  "answer_count": 80,
+  "draft_positive_counts": {
+    "workload": 14,
+    "manager": 14,
+    "career": 13,
+    "communication": 13,
+    "tools": 13,
+    "team": 14,
+    "change": 14
+  },
+  "single_theme_count": 49,
+  "multi_theme_count": 21,
+  "no_theme_count": 10,
+  "human_reviewed_count": 0,
+  "leakage_group_count": 78,
+  "known_links": [
+    "SYN-001 and SYN-002 are deliberate paraphrases.",
+    "SYN-015 and SYN-052 share a fictional respondent."
+  ],
+  "split_status": "No train/validation/test splits assigned; review first.",
+  "generation": "Curated examples embedded in build_pilot.py; no random template expansion or API calls.",
+  "limitations": [
+    "Artificial theme balance, style and overlap do not represent employee feedback.",
+    "Human checking of AI labels is assisted review, not independent inter-annotator agreement.",
+    "Unrecorded semantic similarities may remain; review family grouping before future splitting.",
+    "This visible pilot must not later be described as an untouched final test set."
+  ],
+  "initial_file_sha256": {
+    "review.csv": "ce5924149fcab449119b98a5292d3ce5e67a5483285fc595c400182008b5c52e",
+    "blind-review.csv": "3af3796cf22f958e27a4181c6c1483eaf43b9d3b04608d9cff44353c078bfeaa",
+    "data-preview.md": "4b52c62a4f5bf870ed34f1391bcbdbbbb7877a69c90e259f628780afecc71abd"
+  }
+}

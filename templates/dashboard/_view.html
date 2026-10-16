@@ -1,0 +1,14 @@
+<form class='filter-panel' method='get' action='{% url "pulse:dashboard" %}' hx-get='{% url "pulse:dashboard" %}' hx-target='#dashboard-view' hx-indicator='#loading' data-question-family='{% if is_imported %}uploaded:{{ question.survey_import.name }}{% else %}demo{% endif %}'>
+  <fieldset class='question-field'><legend>Question</legend>
+    <details class='question-picker'>
+      <summary>{{ question.text }}</summary>
+      <div class='question-options' role='group' aria-label='Choose a question'>
+        {% for item in questions %}<label><input type='radio' name='question' value='{{ item.slug }}' {% if item.slug == question.slug %}checked{% endif %} data-change-question data-question-family='{% if item.survey_import %}uploaded:{{ item.survey_import.name }}{% else %}demo{% endif %}'><span>{{ item.text }}{% if item.survey_import %}<small>{{ item.survey_import.label }}</small>{% else %}<small>Demonstration survey</small>{% endif %}</span></label>{% endfor %}
+      </div>
+    </details>
+  </fieldset>
+  {% include 'components/period_filter.html' %}
+  {% include 'components/work_area_filter.html' %}
+  <div class='form-row'><button class='button primary' type='submit'>Apply filters</button><span id='loading' class='htmx-indicator' role='status'>Updating…</span></div>
+</form>
+<div id='dashboard-results'>{% include 'dashboard/_results.html' %}</div>

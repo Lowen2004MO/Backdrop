@@ -1,0 +1,16 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+db.sqlite3
+.env
+staticfiles/
+*.egg-info/
+infra/venv/
+infra/.tools/
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log

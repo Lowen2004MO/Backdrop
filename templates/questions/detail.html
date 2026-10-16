@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}{{ question.text }} | People Pulse Analytics{% endblock %}
+{% block content %}
+<nav class='breadcrumbs' aria-label='Breadcrumb'>
+  <a href='{% url 'pulse:dashboard' %}'>Dashboard</a> /
+  <a href='{% url 'pulse:questions' %}'>Questions</a> /
+  <span aria-current='page'>{{ question.text }}</span>
+</nav>
+<div class='page-head'>
+  <div>
+    <p class='eyebrow'>Question analysis{% if is_imported %} &middot; Uploaded survey{% endif %}</p>
+    <h1>{{ question.text }}</h1>
+    {% if is_imported %}<p>{{ question.survey_import.label }} &middot; {{ question.get_response_type_display }} &middot; {{ question.mapping_state }}</p>{% endif %}
+  </div>
+  <a class='button' href='{% url 'pulse:configure_report' %}?source=Question&question={{ question.slug }}&{{ request.GET.urlencode }}'>Export question</a>
+</div>
+<form class="filter-panel" method="get">
+  {% include 'components/period_filter.html' %}
+  {% include 'components/work_area_filter.html' %}
+  <button class="button primary" type="submit">{% if is_imported %}Apply group filter{% else %}Update periods{% endif %}</button>
+</form>
+<div id='question-results'>{% include 'questions/_distribution.html' %}</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | People Pulse Analytics{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Overview</p><h1>Dashboard</h1><p>Compare selected answers across survey periods and work areas.</p></div><a class="button" href="{% url 'pulse:configure_report' %}?source=Dashboard&{{ request.GET.urlencode }}">Export this view</a></div>
+<div id="dashboard-view">{% include 'dashboard/_view.html' %}</div>
+{% endblock %}

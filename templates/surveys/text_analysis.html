@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Text analysis | {{ survey.label }}{% endblock %}
+{% block content %}
+<nav class='breadcrumbs' aria-label='Breadcrumb'><a href='{% url 'pulse:surveys' %}'>Surveys</a> / <a href='{% url 'pulse:imported_survey' survey.pk %}'>{{ survey.label }}</a> / <span aria-current='page'>Text analysis</span></nav>
+<div class='page-head'>
+  <div>
+    <p class='eyebrow'>Local explainable analysis</p>
+    <h1>Written-response themes</h1>
+    <p>{{ survey.label }} &middot; Model {{ model_version|default:'Not yet run' }}</p>
+  </div>
+  {% if can_upload %}<form method='post' action='{% url 'pulse:run_text_analysis' survey.pk %}'>{% csrf_token %}<button class='button primary' type='submit'>Refresh text analysis</button></form>{% endif %}
+</div>
+<div class='notice'>Themes and quantitative relationships are decision-support evidence, not proof of cause. Results for groups smaller than {{ minimum_group_size }} are suppressed.</div>
+
+<section class='panel'>
+  <h2>Collective themes</h2>
+  <div class='table-wrap'><table>
+    <caption>Reviewed theme prevalence and supporting evidence</caption>
+    <thead><tr><th>Theme</th><th>Respondents</th><th>Prevalence</th><th>Sentiment signals</th><th>Evidence</th></tr></thead>
+    <tbody>{% for row in theme_rows %}<tr>
+      <th>{{ row.theme.name }}<br><small>{{ row.theme.description }}</small></th>
+      <td>{{ row.responses }}</td><td>{{ row.prevalence }}%</td>
+      <td>{{ row.sentiments.positive|default:0 }} positive; {{ row.sentiments.negative|default:0 }} negative; {{ row.sentiments.mixed|default:0 }} mixed</td>
+      <td>{% for annotation in row.evidence %}<blockquote>{{ annotation.evidence }} <small>{{ annotation.confidence }}% confidence; {{ annotation.get_sentiment_display }}</small></blockquote>{% endfor %}</td>
+    </tr>{% empty %}<tr><td colspan='5'>No reviewed themes were detected in the written responses.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+
+<section class='panel'>
+  <h2>Links with quantitative answers</h2>
+  <p>The difference compares the negative-answer rate among respondents mentioning a theme with those who did not mention it.</p>
+  <div class='table-wrap'><table>
+    <caption>Descriptive theme and dissatisfaction associations</caption>
+    <thead><tr><th>Question</th><th>Theme</th><th>Theme mentions</th><th>Negative with theme</th><th>Negative without theme</th><th>Difference</th></tr></thead>
+    <tbody>{% for row in associations %}<tr><th><a href='{% url 'pulse:question' row.question.slug %}'>{{ row.question.text }}</a></th><td>{{ row.theme.name }}</td><td>{{ row.mentioned }}</td><td>{{ row.negative_rate_with }}%</td><td>{{ row.negative_rate_without }}%</td><td>{{ row.difference|stringformat:'+d' }} percentage points</td></tr>{% empty %}<tr><td colspan='6'>No association met the minimum group-size threshold.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+
+<section class='panel'>
+  <h2>Theme trends between survey periods</h2>
+  {% for trend in trends %}<h3>{{ trend.theme.name }}</h3><div class='movement-row'>{% for point in trend.points %}<span><strong>{{ point.survey.financial_year }} {{ point.survey.quarter }}</strong><br>{{ point.prevalence }}%</span>{% endfor %}</div>{% empty %}<p>Import another period with the same survey name to build longitudinal theme trends.</p>{% endfor %}
+</section>
+
+<section class='panel'>
+  <h2>Theme patterns by respondent dimension</h2>
+  <div class='table-wrap'><table>
+    <caption>Theme prevalence by configured filters</caption>
+    <thead><tr><th>Dimension</th><th>Group</th><th>Responses</th><th>Theme</th><th>Prevalence</th></tr></thead>
+    <tbody>{% for comparison in dimension_comparisons %}{% for group in comparison.groups %}{% if group.suppressed %}<tr><th>{{ comparison.dimension.text }}</th><td>{{ group.value }}</td><td>{{ group.responses }}</td><td colspan='2'>Suppressed: group is below the minimum size.</td></tr>{% else %}{% for item in group.themes %}<tr><th>{{ comparison.dimension.text }}</th><td>{{ group.value }}</td><td>{{ group.responses }}</td><td>{{ item.theme.name }}</td><td>{{ item.prevalence }}%</td></tr>{% empty %}<tr><th>{{ comparison.dimension.text }}</th><td>{{ group.value }}</td><td>{{ group.responses }}</td><td colspan='2'>No reviewed themes detected.</td></tr>{% endfor %}{% endif %}{% endfor %}{% empty %}<tr><td colspan='5'>No respondent dimensions are configured.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+
+<section class='panel'>
+  <h2>Suggested topics requiring human review</h2>
+  <p>Repeated unmatched language is never added to the reviewed catalogue automatically.</p>
+  {% for theme in proposed_themes %}<div class='movement-row'><span><strong>{{ theme.name }}</strong><br>{{ theme.description }}</span>{% if can_upload %}<span class='button-row'><form method='post' action='{% url 'pulse:review_text_theme' survey.pk theme.pk 'reviewed' %}'>{% csrf_token %}<button class='button primary' type='submit'>Approve</button></form><form method='post' action='{% url 'pulse:review_text_theme' survey.pk theme.pk 'rejected' %}'>{% csrf_token %}<button class='button' type='submit'>Reject</button></form></span>{% endif %}</div>{% empty %}<p>No unreviewed topics were proposed.</p>{% endfor %}
+</section>
+{% endblock %}

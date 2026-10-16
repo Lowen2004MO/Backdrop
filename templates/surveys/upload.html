@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Upload survey | People Pulse Analytics{% endblock %}
+{% block content %}
+<nav class='breadcrumbs' aria-label='Breadcrumb'><a href='{% url 'pulse:surveys' %}'>Surveys</a> / <span aria-current='page'>Upload</span></nav>
+<div class='page-head'><div><p class='eyebrow'>Administrator and analyst tool</p><h1>Upload survey</h1><p>Microsoft Forms CSV exports are supported. Likert statements become separate metrics, categorical cohort questions become configurable filters, free text remains available for review, and 0–10 recommendation scores are grouped for analysis. The original CSV file is discarded.</p></div><div class='button-row'><a class='button' href='{% url 'pulse:download_sample' %}'>Download full sample</a><a class='button' href='{% url 'pulse:download_acquisition_sample' %}'>Download acquisition sample</a></div></div>
+<div class='notice'><strong>Manual test:</strong> download the sample, select it below, choose a period, and press <em>Import and analyse</em>. Additional columns will appear as new questions.</div>
+<form class='panel form-stack' method='post' enctype='multipart/form-data' hx-post='{% url 'pulse:upload' %}' hx-target='#validation-preview' hx-encoding='multipart/form-data'>
+  {% csrf_token %}{% if form.errors %}<div class='error-summary' role='alert'><strong>Correct the errors below.</strong></div>{% endif %}
+  {% for field in form %}<div><label for='{{ field.id_for_label }}'>{{ field.label }}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<p class='field-error'>{{ error }}</p>{% endfor %}</div>{% endfor %}
+  <button class='button primary' type='submit'>Import and analyse</button>
+</form>
+<div id='validation-preview' aria-live='polite'>{% include 'surveys/_preview.html' %}</div>
+{% endblock %}

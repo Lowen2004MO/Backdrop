@@ -1,0 +1,12 @@
+{% load static %}<!doctype html>
+<html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>{% block title %}People Pulse Analytics{% endblock %}</title><link rel='stylesheet' href='{% static 'css/app.css' %}?v=11'><script src='{% static 'js/htmx.min.js' %}' defer></script><script src='{% static 'js/app.js' %}?v=7' defer></script></head>
+<body><a class='skip-link' href='#main'>Skip to main content</a>
+{% if user.is_authenticated %}<header class='app-header'><a class='brand' href='{% url 'pulse:dashboard' %}'>People Pulse <span>Analytics</span></a>
+<button class='menu-button' type='button' aria-expanded='false' aria-controls='primary-nav'>Menu</button>
+<nav id='primary-nav' aria-label='Primary'><a href='{% url 'pulse:dashboard' %}' {% if request.resolver_match.url_name == 'dashboard' %}aria-current='page'{% endif %}>Dashboard</a><a href='{% url 'pulse:questions' %}' {% if 'question' in request.resolver_match.url_name %}aria-current='page'{% endif %}>Questions</a><a href='{% url 'pulse:themes' %}' {% if 'theme' in request.resolver_match.url_name %}aria-current='page'{% endif %}>Themes</a><a href='{% url 'pulse:employees' %}' {% if 'employee' in request.resolver_match.url_name %}aria-current='page'{% endif %}>Employees</a><a href='{% url 'pulse:surveys' %}' {% if 'survey' in request.resolver_match.url_name or request.resolver_match.url_name == 'upload' %}aria-current='page'{% endif %}>Surveys</a><a href='{% url 'pulse:reports' %}' {% if 'report' in request.resolver_match.url_name %}aria-current='page'{% endif %}>Reports</a></nav>
+<div class='account'>{% if can_upload %}<a class='header-action' href='{% url 'pulse:upload' %}'>Upload survey</a>{% endif %}<span><strong>{{ user.get_full_name|default:user.username }}</strong><small>{{ user.role_name }}</small></span><form method='post' action='{% url 'accounts:logout' %}'>{% csrf_token %}<button class='link-button' type='submit'>Log out</button></form></div></header>
+<div class='synthetic' role='note'>Demonstration environment &mdash; not for employment decisions</div>{% endif %}
+{% if messages %}<div class='messages' aria-live='polite'>{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
+<main id='main' class='{% if not user.is_authenticated %}login-main{% endif %}' tabindex='-1'>{% block content %}{% endblock %}</main>
+</body></html>

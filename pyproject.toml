@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "people-pulse-analytics"
+version = "0.1.0"
+description = "Local-first frontend for employee pulse-survey analysis"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.40,<2",
+    "Django>=5.2.17,<5.3",
+    "gunicorn>=23,<24",
+    "psycopg[binary]>=3.2,<3.3",
+    "whitenoise>=6.9,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3", "pytest-django>=4.11"]
+ui = [
+    "axe-playwright-python>=0.1.8,<0.2",
+    "pytest-playwright>=0.9,<0.10",
+]
+
+[tool.setuptools.packages.find]
+include = ["people_pulse*", "apps*", "services*"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "people_pulse.settings.test"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "ui: browser-based Playwright tests (requires a separately installed browser)",
+]

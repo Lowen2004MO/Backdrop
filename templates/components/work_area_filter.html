@@ -1,0 +1,20 @@
+<fieldset class='period-selector'>
+  <legend>Work areas and groups</legend>
+  <div class='period-toolbar'>
+    {% if is_imported and dimensions %}<label class='dimension-label'>Group respondents by
+      <select name='dimension'>{% for dimension in dimensions %}<option value='{{ dimension.pk }}' {% if dimension == selected_dimension %}selected{% endif %}>{{ dimension.text }}</option>{% endfor %}</select>
+    </label>{% endif %}
+    <label class='group-shortcut'><input type='checkbox' name='all_groups' value='1' {% if all_groups_checked %}checked{% endif %}> All groups combined</label>
+    <details class='period-dropdown'>
+      <summary>Select groups <span>{{ selected_groups|length }} selected</span></summary>
+      <div class='period-dropdown-panel'>
+        <p class='field-hint'>Select a work area to focus on it, or several to compare them.</p>
+        <div class='checkbox-grid' role='group' aria-label='Available respondent groups'>
+          {% for group in groups %}<label><input type='checkbox' name='group' value='{{ group }}' {% if group in selected_groups %}checked{% endif %}> <span>{{ group }}</span></label>{% empty %}<p>No eligible groups are available for this question.</p>{% endfor %}
+        </div>
+        <button class='button primary' type='button' data-close-dropdown>OK</button>
+      </div>
+    </details>
+  </div>
+  {% if suppressed_groups %}<p class='field-hint'>Groups with fewer than {{ minimum_group_size }} responses in a period are hidden for that period.</p>{% endif %}
+</fieldset>

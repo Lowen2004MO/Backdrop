@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Surveys | People Pulse Analytics{% endblock %}
+{% block content %}
+<div class='page-head'>
+  <div><p class='eyebrow'>Survey catalogue</p><h1>Surveys</h1><p>Review uploaded survey data and the eight protected demonstration datasets.</p></div>
+  {% if can_upload %}<div class='form-row'><a class='button' href='{% url 'pulse:download_sample' %}'>Download sample CSV</a><a class='button primary' href='{% url 'pulse:upload' %}'>Upload survey</a></div>{% endif %}
+</div>
+<section class='panel'>
+  <div class='section-head'><div><h2>Uploaded surveys</h2><p class='muted'>Detected questions and parsed response values are available for analysis. The original CSV file is not retained.</p></div>{% if can_upload %}<a class='button primary' href='{% url 'pulse:upload' %}'>Upload a new survey</a>{% endif %}</div>
+  {% if uploaded_surveys %}
+  <div class='table-wrap'><table><caption>Uploaded surveys</caption><thead><tr><th>Name</th><th>Period</th><th>Source file</th><th>Rows</th><th>Questions</th><th>Updated</th><th>Status</th>{% if can_upload %}<th>Actions</th>{% endif %}</tr></thead><tbody>
+  {% for item in uploaded_surveys %}<tr><th><a href='{% url 'pulse:imported_survey' item.pk %}'>{{ item.name }}</a></th><td>{{ item.financial_year }} {{ item.quarter }}</td><td>{{ item.source_filename }}</td><td>{{ item.response_count }}</td><td>{{ item.questions.count }}</td><td>{{ item.updated_at|date:'j M Y, H:i' }}</td><td><span class='status status-completed'>{{ item.status }}</span></td>{% if can_upload %}<td><a class='danger-link' href='{% url 'pulse:delete_survey_import' item.pk %}'>Remove</a></td>{% endif %}</tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<div class='empty-inline'><p>No surveys have been uploaded yet.</p>{% if can_upload %}<a href='{% url 'pulse:upload' %}'>Upload and analyse a CSV</a>{% endif %}</div>{% endif %}
+</section>
+<section class='panel'>
+  <h2>Built-in demonstration surveys</h2><p class='muted'>These baseline records are protected and cannot be removed.</p>
+  <div class='table-wrap'><table><caption>Demonstration survey periods and processing state</caption><thead><tr><th>Period</th><th>Date</th><th>Version</th><th>Responses</th><th>Survey</th><th>Analysis</th></tr></thead><tbody>{% for item in surveys %}<tr><th><a href='{% url 'pulse:survey' item.slug %}'>{{ item.label }}</a></th><td>{{ item.date }}</td><td>{{ item.version }}</td><td>{{ item.responses }}</td><td><span class='status'>{{ item.status }}</span></td><td><span class='status status-{{ item.analysis_status|lower }}'>{{ item.analysis_status }}</span></td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

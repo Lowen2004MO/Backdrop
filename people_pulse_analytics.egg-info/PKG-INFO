@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: people-pulse-analytics
+Version: 0.1.0
+Summary: Local synthetic frontend for employee pulse-survey analysis
+Requires-Python: >=3.11
+Requires-Dist: boto3<2,>=1.40
+Requires-Dist: Django<5.3,>=5.2.17
+Requires-Dist: gunicorn<24,>=23
+Requires-Dist: psycopg[binary]<3.3,>=3.2
+Requires-Dist: whitenoise<7,>=6.9
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3; extra == "dev"
+Requires-Dist: pytest-django>=4.11; extra == "dev"
+Provides-Extra: ui
+Requires-Dist: axe-playwright-python<0.2,>=0.1.8; extra == "ui"
+Requires-Dist: pytest-playwright<0.10,>=0.9; extra == "ui"
